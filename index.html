@@ -1,0 +1,198 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="Mizan : cours de l'or et de l'argent en direct et estimateur de bijoux pour la Bijouterie Al Andalous, Nador."
+    />
+    <title>Mizan — Bijouterie Al Andalous</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <script type="module" src="js/main.js"></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Aller au contenu</a>
+
+    <header class="app-header">
+      <div class="brand">
+        <svg
+          class="brand-mark"
+          viewBox="0 0 24 24"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path d="M12 2.5 21.5 12 12 21.5 2.5 12Z" fill="currentColor" />
+        </svg>
+        <div>
+          <h1 class="brand-name">Mizan</h1>
+          <p class="brand-sub">Bijouterie Al Andalous — Nador</p>
+        </div>
+      </div>
+
+      <div class="header-controls">
+        <select
+          id="currency-select"
+          class="control"
+          aria-label="Choisir la devise"
+        ></select>
+
+        <button id="btn-refresh" class="btn btn-primary" type="button">
+          <svg
+            class="icon"
+            viewBox="0 0 24 24"
+            aria-hidden="true"
+            focusable="false"
+          >
+            <path
+              d="M20 12a8 8 0 1 1-2.34-5.66M20 4v5h-5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+          Actualiser
+        </button>
+
+        <p class="updated-badge">
+          <span class="dot" aria-hidden="true"></span>
+          <span id="last-updated-text">En attente...</span>
+        </p>
+      </div>
+    </header>
+
+    <main id="main" class="dashboard">
+      <div id="status-banner" class="status-banner hidden" role="alert">
+        <span id="status-icon" class="status-icon"></span>
+        <p id="status-message" class="status-message"></p>
+        <button id="btn-retry" class="btn-retry hidden" type="button">
+          Réessayer
+        </button>
+      </div>
+
+      <section class="cards-section" aria-labelledby="prices-title">
+        <h2 id="prices-title" class="section-title">Cours en direct</h2>
+        <div id="cards-container" class="cards-grid"></div>
+      </section>
+
+      <section class="history-section panel" aria-labelledby="history-title">
+        <div class="panel-head">
+          <h2 id="history-title" class="section-title">Historique des cours</h2>
+          <div class="history-controls">
+            <div
+              id="chart-metals-group"
+              class="segmented"
+              role="group"
+              aria-label="Choisir le métal"
+            ></div>
+            <div
+              id="chart-periods-group"
+              class="segmented"
+              role="group"
+              aria-label="Choisir la période"
+            ></div>
+          </div>
+        </div>
+
+        <ul class="stat-bar" aria-label="Résumé de la période">
+          <li class="stat-badge">
+            <span class="stat-label">Minimum</span
+            ><strong id="stat-min" class="stat-value">—</strong>
+          </li>
+          <li class="stat-badge">
+            <span class="stat-label">Maximum</span
+            ><strong id="stat-max" class="stat-value">—</strong>
+          </li>
+          <li class="stat-badge">
+            <span class="stat-label">Moyenne</span
+            ><strong id="stat-avg" class="stat-value">—</strong>
+          </li>
+        </ul>
+
+        <div id="chart-container" class="chart-container"></div>
+      </section>
+
+      <section
+        class="estimator-section panel"
+        aria-labelledby="estimator-title"
+      >
+        <h2 id="estimator-title" class="section-title">
+          Estimateur de Bijoux (Comptoir)
+        </h2>
+
+        <form id="estimator-form" class="estimator-form" novalidate>
+          <div class="field">
+            <label for="input-weight">Poids (en grammes)</label>
+            <input
+              id="input-weight"
+              class="control"
+              type="number"
+              step="0.01"
+              min="0"
+              inputmode="decimal"
+              placeholder="Ex: 15.5"
+              aria-describedby="weight-error-msg"
+            />
+            <p
+              id="weight-error-msg"
+              class="field-error-msg hidden"
+              aria-live="polite"
+            ></p>
+          </div>
+
+          <div class="field">
+            <label for="estimator-metal-select">Métal</label>
+            <select id="estimator-metal-select" class="control"></select>
+          </div>
+
+          <div class="field">
+            <label for="estimator-purity-select">Pureté</label>
+            <select id="estimator-purity-select" class="control">
+              <option value="1">Or 24K (100%)</option>
+              <option value="0.925">Argent 925</option>
+              <option value="0.75" selected>
+                Or 18K (750/1000 — standard marocain)
+              </option>
+            </select>
+          </div>
+
+          <div class="estimate-result-box">
+            <span class="label">Valeur estimée :</span>
+            <span
+              id="estimate-result-value"
+              class="result-highlight"
+              aria-live="polite"
+              >0.00 MAD</span
+            >
+          </div>
+        </form>
+      </section>
+
+      <details id="network-logs-drawer" class="logs-drawer">
+        <summary class="logs-summary">
+          Journal réseau (<span id="logs-count">0</span>)
+        </summary>
+        <div class="logs-toolbar">
+          <button id="btn-clear-logs" class="btn btn-ghost" type="button">
+            Effacer
+          </button>
+        </div>
+        <div id="logs-container" class="logs-content"></div>
+      </details>
+    </main>
+
+    <footer class="app-footer">
+      <p>
+        Mizan — Bijouterie Al Andalous, Nador. Les estimations sont indicatives.
+      </p>
+    </footer>
+  </body>
+</html>
