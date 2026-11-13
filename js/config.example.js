@@ -1,5 +1,5 @@
-export const API_KEY = "YOUR_API_KEY_HERE";
-export const API_BASE_URL = "https://api.goldprice.dev/v1";
+export const API_KEY = "";
+export const API_BASE_URL = "https://xaus.com/api/v1";
 
 export const DEFAULT_CURRENCY = "MAD";
 export const SUPPORTED_CURRENCIES = ["MAD", "USD", "EUR"];
