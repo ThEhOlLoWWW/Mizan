@@ -14,3 +14,14 @@ export function setBusy(isBusy) {
     el.disabled = isBusy;
   });
 }
+
+export function renderSkeleton(count = 2) {
+  const cards = document.getElementById("cards");
+  cards.replaceChildren();
+  for (let i = 0; i < count; i++) {
+    const card = document.createElement("article");
+    card.className = "price skeleton";
+    card.setAttribute("aria-hidden", "true");
+    cards.appendChild(card);
+  }
+}
