@@ -1,18 +1,3 @@
-export function setBanner(status, text) {
-  const stat = document.getElementById("status");
-  const statusText = document.getElementById("status-text");
-
-  stat.dataset.state = status;
-  statusText.textContent = text;
-}
-
-export function setBusyState(isBusy) {
-  const datas = document.querySelectorAll("[data-busy]");
-  datas.forEach((data) => {
-    data.dataset.disabled = "isBusy";
-  });
-}
-
 export function setStatus(state, message) {
   const stat = document.getElementById("status");
   const statText = document.getElementById("status-text");
