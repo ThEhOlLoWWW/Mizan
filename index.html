@@ -41,7 +41,12 @@
           id="currency-select"
           class="control"
           aria-label="Choisir la devise"
-        ></select>
+          data-busy
+        >
+          <option value="MAD" selected>MAD (Dirham)</option>
+          <option value="USD">USD (Dollar)</option>
+          <option value="EUR">EUR (Euro)</option>
+        </select>
 
         <button id="btn-refresh" class="btn btn-primary" type="button">
           <svg
@@ -150,7 +155,10 @@
 
           <div class="field">
             <label for="estimator-metal-select">Métal</label>
-            <select id="estimator-metal-select" class="control"></select>
+            <select id="estimator-metal-select" class="control">
+              <option value="XAU" selected>Or (XAU)</option>
+              <option value="XAG">Argent (XAG)</option>
+            </select>
           </div>
 
           <div class="field">

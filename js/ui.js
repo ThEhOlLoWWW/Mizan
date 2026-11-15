@@ -1,4 +1,5 @@
 import { TRACKED_METALS } from "./config.js";
+import { SUPPORTED_CURRENCIES } from "./config.js";
 import { convertOunceToGram } from "./calculator.js";
 
 export function setStatus(state, message) {
@@ -93,4 +94,23 @@ export function formatTimestamp(isoString) {
   const date = isoString ? new Date(isoString) : new Date();
   const validDate = Number.isNaN(date.getTime()) ? new Date() : date;
   return `Mis à jour à ${validDate.toLocaleTimeString("fr-FR")}`;
+}
+
+export function populateSelect(selectEl, items) {
+  selectEl.replaceChildren();
+
+  items.forEach((item) => {
+    const option = document.createElement("option");
+    option.value = item.value;
+    option.textContent = item.label;
+    selectEl.appendChild(option);
+  });
+}
+
+export function initHeaderAndMetalSelects() {
+  const currency = document.getElementById("currency");
+  const histMetal = document.getElementById("hist-metal");
+  const estMetal = document.getElementById("est-metal");
+
+  
 }
