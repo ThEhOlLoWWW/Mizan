@@ -48,3 +48,7 @@ export function calculateJewelryValue(
   const total = weight * price * purity;
   return Math.round(total * 100) / 100;
 }
+
+export function calculateChangePct(previousClose, lastClose) {
+  return ((lastClose - previousClose) / previousClose) * 100;
+}
