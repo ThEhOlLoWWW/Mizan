@@ -24,8 +24,13 @@ export function renderSkeleton(count = 2) {
   cards.replaceChildren();
   for (let i = 0; i < count; i++) {
     const card = document.createElement("article");
-    card.className = "price skeleton";
+    card.className = "skeleton-card";
     card.setAttribute("aria-hidden", "true");
+    ["sm", "lg", ""].forEach((size) => {
+      const line = document.createElement("div");
+      line.className = `skeleton-line ${size}`;
+      card.appendChild(line);
+    });
     cards.appendChild(card);
   }
 }
@@ -37,11 +42,11 @@ const fmt = new Intl.NumberFormat("fr-FR", {
 
 export function createAmountElement(value, currency) {
   const p = document.createElement("p");
-  p.className = "amount";
+  p.className = "card-price";
   p.textContent = `${fmt.format(value)} `;
 
   const span = document.createElement("span");
-  span.className = "unit";
+  span.className = "card-unit";
   span.textContent = `${currency}/g`;
 
   p.appendChild(span);
@@ -53,7 +58,7 @@ export function createChangeElement(changePct, changeValue, currency) {
   const p = document.createElement("p");
 
   if (changePct === undefined) {
-    p.className = "change flat";
+    p.className = "card-variation flat";
     p.textContent = "Variation indisponible";
     return p;
   }
@@ -62,7 +67,7 @@ export function createChangeElement(changePct, changeValue, currency) {
   const arrow = changePct > 0 ? "▲" : changePct < 0 ? "▼" : "–";
   const sign = changePct > 0 ? "+" : "";
 
-  p.className = `change ${trend}`;
+  p.className = `card-variation ${trend}`;
   p.textContent = `${arrow} ${sign}${fmt.format(changeValue)} ${currency}/g (${sign}${fmt.format(changePct)} %)`;
   return p;
 }
@@ -77,15 +82,10 @@ export function renderCards(spotData) {
     const changeValue = (gramPrice * metal.changePct) / (100 + metal.changePct);
 
     const article = document.createElement("article");
-    article.className = `price ${metal.symbol.toLowerCase()}`;
-
-    const coin = document.createElement("div");
-    coin.className = "coin";
-    coin.textContent = metal.symbol;
-
-    const info = document.createElement("div");
+    article.className = `card ${metal.symbol.toLowerCase()}`;
 
     const title = document.createElement("h3");
+    title.className = "card-title";
     title.textContent = `${name} (${metal.symbol})`;
 
     const amount = createAmountElement(gramPrice, spotData.currency);
@@ -96,11 +96,10 @@ export function renderCards(spotData) {
     );
 
     const meta = document.createElement("p");
-    meta.className = "meta";
+    meta.className = "card-unit";
     meta.textContent = `${fmt.format(metal.pricePerOunce)} ${spotData.currency} / oz`;
 
-    info.append(title, amount, change, meta);
-    article.append(coin, info);
+    article.append(title, amount, change, meta);
     cards.appendChild(article);
   });
 }
