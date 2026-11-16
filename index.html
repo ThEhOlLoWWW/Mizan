@@ -48,7 +48,12 @@
           <option value="EUR">EUR (Euro)</option>
         </select>
 
-        <button id="btn-refresh" class="btn btn-primary" type="button">
+        <button
+          id="btn-refresh"
+          class="btn btn-primary"
+          type="button"
+          data-busy
+        >
           <svg
             class="icon"
             viewBox="0 0 24 24"
@@ -78,7 +83,7 @@
       <div id="status-banner" class="status-banner hidden" role="alert">
         <span id="status-icon" class="status-icon"></span>
         <p id="status-message" class="status-message"></p>
-        <button id="btn-retry" class="btn-retry hidden" type="button">
+        <button id="btn-retry" class="btn-retry hidden" type="button" data-busy>
           Réessayer
         </button>
       </div>

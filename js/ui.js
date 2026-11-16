@@ -1,15 +1,15 @@
-import { TRACKED_METALS } from "./config.js";
-import { SUPPORTED_CURRENCIES } from "./config.js";
 import { convertOunceToGram } from "./calculator.js";
+import { METAL_NAMES } from "./config.js";
 
-export function setStatus(state, message) {
-  const stat = document.getElementById("status");
-  const statText = document.getElementById("status-text");
-  const retry = document.getElementById("retry");
+export function setStatus(state, message = "") {
+  const banner = document.getElementById("status-banner");
+  const text = document.getElementById("status-message");
+  const retry = document.getElementById("btn-retry");
 
-  stat.dataset.state = state;
-  statText.textContent = message;
-  retry.hidden = state !== "error";
+  banner.dataset.state = state;
+  banner.classList.remove("hidden");
+  text.textContent = message;
+  retry.classList.toggle("hidden", state !== "error");
 }
 
 export function setBusy(isBusy) {
@@ -20,7 +20,7 @@ export function setBusy(isBusy) {
 }
 
 export function renderSkeleton(count = 2) {
-  const cards = document.getElementById("cards");
+  const cards = document.getElementById("cards-container");
   cards.replaceChildren();
   for (let i = 0; i < count; i++) {
     const card = document.createElement("article");
@@ -49,40 +49,55 @@ export function createAmountElement(value, currency) {
   return p;
 }
 
-export function createChangeElement(changePct) {
+export function createChangeElement(changePct, changeValue, currency) {
   const p = document.createElement("p");
-  const trend = changePct > 0 ? "up" : changePct < 0 ? "down" : "flat";
-  p.className = `change ${trend}`;
-  p.textContent = `${changePct > 0 ? "+" : ""}${fmt.format(changePct)} % (24h)`;
 
+  if (changePct === undefined) {
+    p.className = "change flat";
+    p.textContent = "Variation indisponible";
+    return p;
+  }
+
+  const trend = changePct > 0 ? "up" : changePct < 0 ? "down" : "flat";
+  const arrow = changePct > 0 ? "▲" : changePct < 0 ? "▼" : "–";
+  const sign = changePct > 0 ? "+" : "";
+
+  p.className = `change ${trend}`;
+  p.textContent = `${arrow} ${sign}${fmt.format(changeValue)} ${currency}/g (${sign}${fmt.format(changePct)} %)`;
   return p;
 }
 
 export function renderCards(spotData) {
-  const cards = document.getElementById("cards");
+  const cards = document.getElementById("cards-container");
   cards.replaceChildren();
-  TRACKED_METALS.forEach((metal) => {
-    const metalData = spotData.prices[metal.symbol];
-    const gramPrice = convertOunceToGram(metalData.ounce);
+
+  spotData.metals.forEach((metal) => {
+    const name = METAL_NAMES[metal.symbol] || metal.symbol;
+    const gramPrice = convertOunceToGram(metal.pricePerOunce);
+    const changeValue = (gramPrice * metal.changePct) / (100 + metal.changePct);
 
     const article = document.createElement("article");
     article.className = `price ${metal.symbol.toLowerCase()}`;
 
     const coin = document.createElement("div");
     coin.className = "coin";
-    coin.textContent = metal.symbol === "XAU" ? "Au" : "Ag";
+    coin.textContent = metal.symbol;
 
     const info = document.createElement("div");
 
     const title = document.createElement("h3");
-    title.textContent = `${metal.name} (${metal.symbol})`;
+    title.textContent = `${name} (${metal.symbol})`;
 
     const amount = createAmountElement(gramPrice, spotData.currency);
-    const change = createChangeElement(metalData.change_24h);
+    const change = createChangeElement(
+      metal.changePct,
+      changeValue,
+      spotData.currency,
+    );
 
     const meta = document.createElement("p");
     meta.className = "meta";
-    meta.textContent = `${fmt.format(metalData.ounce)} ${spotData.currency} / oz`;
+    meta.textContent = `${fmt.format(metal.pricePerOunce)} ${spotData.currency} / oz`;
 
     info.append(title, amount, change, meta);
     article.append(coin, info);
@@ -105,12 +120,4 @@ export function populateSelect(selectEl, items) {
     option.textContent = item.label;
     selectEl.appendChild(option);
   });
-}
-
-export function initHeaderAndMetalSelects() {
-  const currency = document.getElementById("currency");
-  const histMetal = document.getElementById("hist-metal");
-  const estMetal = document.getElementById("est-metal");
-
-  
 }
