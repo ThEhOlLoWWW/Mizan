@@ -1,15 +1,15 @@
-import { TRACKED_METALS } from "./config.js";
-import { SUPPORTED_CURRENCIES } from "./config.js";
 import { convertOunceToGram } from "./calculator.js";
+import { METAL_NAMES } from "./config.js";
 
-export function setStatus(state, message) {
-  const stat = document.getElementById("status");
-  const statText = document.getElementById("status-text");
-  const retry = document.getElementById("retry");
+export function setStatus(state, message = "") {
+  const banner = document.getElementById("status-banner");
+  const text = document.getElementById("status-message");
+  const retry = document.getElementById("btn-retry");
 
-  stat.dataset.state = state;
-  statText.textContent = message;
-  retry.hidden = state !== "error";
+  banner.dataset.state = state;
+  banner.classList.remove("hidden");
+  text.textContent = message;
+  retry.classList.toggle("hidden", state !== "error");
 }
 
 export function setBusy(isBusy) {
@@ -20,12 +20,17 @@ export function setBusy(isBusy) {
 }
 
 export function renderSkeleton(count = 2) {
-  const cards = document.getElementById("cards");
+  const cards = document.getElementById("cards-container");
   cards.replaceChildren();
   for (let i = 0; i < count; i++) {
     const card = document.createElement("article");
-    card.className = "price skeleton";
+    card.className = "skeleton-card";
     card.setAttribute("aria-hidden", "true");
+    ["sm", "lg", ""].forEach((size) => {
+      const line = document.createElement("div");
+      line.className = `skeleton-line ${size}`;
+      card.appendChild(line);
+    });
     cards.appendChild(card);
   }
 }
@@ -37,11 +42,11 @@ const fmt = new Intl.NumberFormat("fr-FR", {
 
 export function createAmountElement(value, currency) {
   const p = document.createElement("p");
-  p.className = "amount";
+  p.className = "card-price";
   p.textContent = `${fmt.format(value)} `;
 
   const span = document.createElement("span");
-  span.className = "unit";
+  span.className = "card-unit";
   span.textContent = `${currency}/g`;
 
   p.appendChild(span);
@@ -49,51 +54,62 @@ export function createAmountElement(value, currency) {
   return p;
 }
 
-export function createChangeElement(changePct) {
+export function createChangeElement(changePct, changeValue, currency) {
   const p = document.createElement("p");
-  const trend = changePct > 0 ? "up" : changePct < 0 ? "down" : "flat";
-  p.className = `change ${trend}`;
-  p.textContent = `${changePct > 0 ? "+" : ""}${fmt.format(changePct)} % (24h)`;
 
+  if (changePct === undefined) {
+    p.className = "card-variation flat";
+    p.textContent = "Variation indisponible";
+    return p;
+  }
+
+  const trend = changePct > 0 ? "up" : changePct < 0 ? "down" : "flat";
+  const arrow = changePct > 0 ? "▲" : changePct < 0 ? "▼" : "–";
+  const sign = changePct > 0 ? "+" : "";
+
+  p.className = `card-variation ${trend}`;
+  p.textContent = `${arrow} ${sign}${fmt.format(changeValue)} ${currency}/g (${sign}${fmt.format(changePct)} %)`;
   return p;
 }
 
 export function renderCards(spotData) {
-  const cards = document.getElementById("cards");
+  const cards = document.getElementById("cards-container");
   cards.replaceChildren();
-  TRACKED_METALS.forEach((metal) => {
-    const metalData = spotData.prices[metal.symbol];
-    const gramPrice = convertOunceToGram(metalData.ounce);
+
+  spotData.metals.forEach((metal) => {
+    const name = METAL_NAMES[metal.symbol] || metal.symbol;
+    const gramPrice = convertOunceToGram(metal.pricePerOunce);
+    const changeValue = (gramPrice * metal.changePct) / (100 + metal.changePct);
 
     const article = document.createElement("article");
-    article.className = `price ${metal.symbol.toLowerCase()}`;
-
-    const coin = document.createElement("div");
-    coin.className = "coin";
-    coin.textContent = metal.symbol === "XAU" ? "Au" : "Ag";
-
-    const info = document.createElement("div");
+    article.className = `card ${metal.symbol.toLowerCase()}`;
 
     const title = document.createElement("h3");
-    title.textContent = `${metal.name} (${metal.symbol})`;
+    title.className = "card-title";
+    title.textContent = `${name} (${metal.symbol})`;
 
     const amount = createAmountElement(gramPrice, spotData.currency);
-    const change = createChangeElement(metalData.change_24h);
+    const change = createChangeElement(
+      metal.changePct,
+      changeValue,
+      spotData.currency,
+    );
 
     const meta = document.createElement("p");
-    meta.className = "meta";
-    meta.textContent = `${fmt.format(metalData.ounce)} ${spotData.currency} / oz`;
+    meta.className = "card-unit";
+    meta.textContent = `${fmt.format(metal.pricePerOunce)} ${spotData.currency} / oz`;
 
-    info.append(title, amount, change, meta);
-    article.append(coin, info);
+    article.append(title, amount, change, meta);
     cards.appendChild(article);
   });
 }
 
 export function formatTimestamp(isoString) {
-  const date = isoString ? new Date(isoString) : new Date();
-  const validDate = Number.isNaN(date.getTime()) ? new Date() : date;
-  return `Mis à jour à ${validDate.toLocaleTimeString("fr-FR")}`;
+  const date = new Date(isoString);
+  if (!isoString || Number.isNaN(date.getTime())) {
+    return "Dernière mise à jour : inconnue";
+  }
+  return `Mis à jour le ${date.toLocaleDateString("fr-FR")} à ${date.toLocaleTimeString("fr-FR")}`;
 }
 
 export function populateSelect(selectEl, items) {
@@ -107,10 +123,29 @@ export function populateSelect(selectEl, items) {
   });
 }
 
-export function initHeaderAndMetalSelects() {
-  const currency = document.getElementById("currency");
-  const histMetal = document.getElementById("hist-metal");
-  const estMetal = document.getElementById("est-metal");
+export function renderEstimate(value, currency) {
+  document.getElementById("estimate-result-value").textContent =
+    `${fmt.format(value)} ${currency}`;
+}
 
-  
+export function showWeightError(message) {
+  const input = document.getElementById("input-weight");
+  const error = document.getElementById("weight-error-msg");
+
+  error.textContent = message;
+  error.classList.toggle("hidden", message === "");
+  input.setAttribute("aria-invalid", message !== "");
+}
+
+export function renderLogs(logs) {
+  document.getElementById("logs-count").textContent = logs.length;
+
+  const container = document.getElementById("logs-container");
+  container.replaceChildren();
+
+  logs.forEach((log) => {
+    const line = document.createElement("p");
+    line.textContent = `${log.timestamp} ${log.method} ${log.url} → ${log.status} (${log.durationMs} ms)`;
+    container.appendChild(line);
+  });
 }

@@ -56,11 +56,26 @@ async function fetchWithLogging(endpoint) {
   }
 }
 
+function buildSpotData(raw) {
+  return {
+    currency: raw.xau.currency,
+    updatedAt: raw.updated_at,
+    isStale: raw.stale,
+    metals: [
+      { symbol: "XAU", pricePerOunce: raw.xau.price },
+      { symbol: "XAG", pricePerOunce: raw.silver_usd_oz * raw.fx_rate },
+    ],
+  };
+}
+
 export async function fetchSpotPrices(currency = "MAD") {
-  return await fetchWithLogging(
+  const raw = await fetchWithLogging(
     `/spot?currency=${encodeURIComponent(currency)}`,
   );
+  return buildSpotData(raw);
 }
-export async function fetchPriceHistory() {
-  return await fetchWithLogging("/history");
+
+export async function fetchPriceHistory(days = 7) {
+  const raw = await fetchWithLogging("/history");
+  return raw.points.slice(-days);
 }

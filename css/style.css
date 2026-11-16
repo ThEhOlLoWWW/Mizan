@@ -36,9 +36,6 @@
 *::after {
   box-sizing: border-box;
 }
-html {
-  -webkit-text-size-adjust: 100%;
-}
 
 body {
   margin: 0;
@@ -53,6 +50,7 @@ body {
 
 h1,
 h2,
+h3,
 p,
 ul {
   margin: 0;
@@ -277,12 +275,13 @@ select.control {
   background: var(--down-bg);
   color: #9f1239;
 }
-.status-banner.success {
+.status-banner[data-state="success"] {
   border-color: rgba(5, 150, 105, 0.22);
   background: var(--up-bg);
   color: #047857;
 }
-.status-banner.warning {
+.status-banner[data-state="loading"],
+.status-banner[data-state="warning"] {
   border-color: rgba(180, 83, 9, 0.22);
   background: var(--warn-bg);
   color: var(--warn);
@@ -357,7 +356,7 @@ select.control {
   background: var(--gold-fill);
   flex: none;
 }
-.card.silver .card-title::before {
+.card.xag .card-title::before {
   background: var(--silver);
 }
 
@@ -806,4 +805,19 @@ select.control {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+.card-variation.flat {
+  color: var(--muted);
+  background: var(--surface-2);
+}
+.control:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.logs-content p {
+  padding: 0.55rem 1.25rem;
+  border-bottom: 1px solid var(--line);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
 }

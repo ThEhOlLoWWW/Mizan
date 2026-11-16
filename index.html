@@ -16,6 +16,7 @@
     />
     <link rel="stylesheet" href="css/style.css" />
     <script type="module" src="js/main.js"></script>
+    <link rel="icon" href="data:," />
   </head>
   <body>
     <a class="skip-link" href="#main">Aller au contenu</a>
@@ -48,7 +49,12 @@
           <option value="EUR">EUR (Euro)</option>
         </select>
 
-        <button id="btn-refresh" class="btn btn-primary" type="button">
+        <button
+          id="btn-refresh"
+          class="btn btn-primary"
+          type="button"
+          data-busy
+        >
           <svg
             class="icon"
             viewBox="0 0 24 24"
@@ -78,7 +84,7 @@
       <div id="status-banner" class="status-banner hidden" role="alert">
         <span id="status-icon" class="status-icon"></span>
         <p id="status-message" class="status-message"></p>
-        <button id="btn-retry" class="btn-retry hidden" type="button">
+        <button id="btn-retry" class="btn-retry hidden" type="button" data-busy>
           Réessayer
         </button>
       </div>
@@ -164,11 +170,11 @@
           <div class="field">
             <label for="estimator-purity-select">Pureté</label>
             <select id="estimator-purity-select" class="control">
-              <option value="1">Or 24K (100%)</option>
-              <option value="0.925">Argent 925</option>
-              <option value="0.75" selected>
+              <option value="0.75" data-metal="XAU" selected>
                 Or 18K (750/1000 — standard marocain)
               </option>
+              <option value="1" data-metal="XAU">Or 24K (100%)</option>
+              <option value="0.925" data-metal="XAG">Argent 925</option>
             </select>
           </div>
 
