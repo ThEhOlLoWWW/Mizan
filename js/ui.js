@@ -123,3 +123,30 @@ export function populateSelect(selectEl, items) {
     selectEl.appendChild(option);
   });
 }
+
+export function renderEstimate(value, currency) {
+  document.getElementById("estimate-result-value").textContent =
+    `${fmt.format(value)} ${currency}`;
+}
+
+export function showWeightError(message) {
+  const input = document.getElementById("input-weight");
+  const error = document.getElementById("weight-error-msg");
+
+  error.textContent = message;
+  error.classList.toggle("hidden", message === "");
+  input.setAttribute("aria-invalid", message !== "");
+}
+
+export function renderLogs(logs) {
+  document.getElementById("logs-count").textContent = logs.length;
+
+  const container = document.getElementById("logs-container");
+  container.replaceChildren();
+
+  logs.forEach((log) => {
+    const line = document.createElement("p");
+    line.textContent = `${log.timestamp} ${log.method} ${log.url} → ${log.status} (${log.durationMs} ms)`;
+    container.appendChild(line);
+  });
+}
