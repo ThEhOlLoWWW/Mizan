@@ -106,9 +106,11 @@ export function renderCards(spotData) {
 }
 
 export function formatTimestamp(isoString) {
-  const date = isoString ? new Date(isoString) : new Date();
-  const validDate = Number.isNaN(date.getTime()) ? new Date() : date;
-  return `Mis à jour à ${validDate.toLocaleTimeString("fr-FR")}`;
+  const date = new Date(isoString);
+  if (!isoString || Number.isNaN(date.getTime())) {
+    return "Dernière mise à jour : inconnue";
+  }
+  return `Mis à jour le ${date.toLocaleDateString("fr-FR")} à ${date.toLocaleTimeString("fr-FR")}`;
 }
 
 export function populateSelect(selectEl, items) {
